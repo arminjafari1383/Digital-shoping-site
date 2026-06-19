@@ -1,2 +1,3 @@
 # Digital-shoping-site
-create digital shoping site with react(front framework), django(backend framework),docker and nginx(for devops project))
+First of all create users process includes registe , login , Referesh Token , Edit Profile , Upload Picture , Change Password , Forget Password , Apply Email.
+
