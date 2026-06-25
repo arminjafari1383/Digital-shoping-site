@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'products',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +135,9 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PREMISSION_CLASSES':(
         'rest_framework.permissions.IsAuthenticated',
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_freamework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
     ),
 }
 
