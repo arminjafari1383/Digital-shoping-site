@@ -1,4 +1,7 @@
 from django.db import models
+import uuid
+
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -57,6 +60,11 @@ class Product(models.Model):
         auto_now=True
     )
 
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     def __str__(self):
         return self.title
 
