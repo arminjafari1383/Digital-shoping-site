@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from django.utils.text import slugify
 
 
 
@@ -22,7 +23,8 @@ class Product(models.Model):
     )
 
     slug = models.SlugField(
-        unique=True
+        unique=True,
+        blank=True
     )
 
     description = models.TextField()
@@ -65,9 +67,17 @@ class Product(models.Model):
         default=uuid.uuid4,
         editable=False
     )
+
     def __str__(self):
         return self.title
+    
+    def save(self,*args,**kwargs):
 
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
+        
 class ProductImage(models.Model):
 
     product = models.ForeignKey(
