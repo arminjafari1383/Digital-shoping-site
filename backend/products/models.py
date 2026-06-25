@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 from django.utils.text import slugify
-
+from .managers import ProductManger
 
 
 class Category(models.Model):
@@ -77,7 +77,16 @@ class Product(models.Model):
             self.slug = slugify(self.title)
 
         super().save(*args, **kwargs)
-        
+
+    objects = ProductManger()
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['title']),
+            models.Index(fields=['price']),
+            models.Index(fields=['created_at'])
+        ]
+
 class ProductImage(models.Model):
 
     product = models.ForeignKey(
