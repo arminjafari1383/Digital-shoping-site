@@ -1,6 +1,8 @@
 from rest_framework.generics import *
 from .models import *
 from .serializers import *
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 
 class ProductListView(ListAPIView):
@@ -8,14 +10,17 @@ class ProductListView(ListAPIView):
     queryset = Product.objects.all()
 
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
 
     filterset_fields = [
 
-        'category'
+        'category',
+        'brand',
+        'status'
     
     ]
 
-    searcg_fields = [
+    search_fields = [
 
         'title'
 
@@ -28,6 +33,8 @@ class ProductListView(ListAPIView):
         'created_at'
 
     ]
+
+    
 
 class ProductDetailView(
     RetrieveAPIView
