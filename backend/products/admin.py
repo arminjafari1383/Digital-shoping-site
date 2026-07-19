@@ -7,3 +7,5 @@ admin.site.register(Product)
 
 admin.site.register(ProductImage)
 
+
+admin.site.register(Brand)
