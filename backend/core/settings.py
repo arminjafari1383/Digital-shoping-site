@@ -152,3 +152,18 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
+
+ZARINPAL_MERCHANT_ID = "YOUR_MERCHANT_ID"
+
+ZARINPAL_REQUEST_URL = (
+    "https://sandbox.zarinpal.com/pg/v4/payment/request.json"
+)
+
+ZARINPAL_START_URL = (
+    "https://sandbox.zarinpal.com/pg/StartPay/"
+)
+
+ZARINPAL_VERIFY_URL = (
+    "https://sandbox.zarinpal.com/pg/v4/payment/verify.json"
+)
+
