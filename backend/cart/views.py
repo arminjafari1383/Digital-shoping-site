@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Cart
-from products.models import Product
+from products.models import ProductVariant
 from .serializers import CartSerializer,CartItemSerializer
+from django.shortcuts import get_object_or_404
 
 #helper for get cart
 def get_or_create_cart(request):
@@ -30,15 +31,19 @@ class AddToCartView(APIView):
     def post(self, request):    
         cart = get_or_create_cart(request)
 
-        product_id = request.data.get('product_id')
+        variant_id = request.data.get('variant_id')
 
         quantity = int(request.data.get('quantity',1))
-        print(product_id)
-        print(type(product_id))
+
+        variant = get_object_or_404(
+            ProductVariant,
+            id = variant_id
+        )
+
         product = Product.objects.get(id=product_id)
 
         item,created = cart.items.get_or_create(
-            product=product
+            variant=variant
         )
 
         if not created:

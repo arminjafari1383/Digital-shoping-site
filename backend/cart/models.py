@@ -29,13 +29,14 @@ class CartItem(models.Model):
         related_name='items'
     )
 
-    product = models.ForeignKey(
-        'products.Product',
-        on_delete=models.CASCADE
+    variant = models.ForeignKey(
+        "products.ProductVariant",
+        on_delete=models.CASCADE,
+        related_name="cart_items"
     )
 
     quantity = models.PositiveIntegerField(default=1)
 
     def total_price(self):
-        return self.quantity * self.product.price
+        return self.quantity * self.variant.price
     

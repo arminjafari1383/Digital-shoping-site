@@ -11,7 +11,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("id","user","status","total_price","created_at")
     list_filter = ("status",)
-    search_fields = ("user__email")
+    search_fields = ("user__email",)
 
     inlines = [OrderItemInline]
 
