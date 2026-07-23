@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.utils.text import slugify
 from .managers import ProductManager
+from django.db.models import Avg
 
 
 class Category(models.Model):
@@ -224,4 +225,14 @@ class ProductImage(models.Model):
     )
 
 
+
+@property
+def average_rating(self):
+    return self.reviews.aggregate(
+        Avg("rating")
+    )["rating__avg"] or 0
+
+@property
+def review_count(self):
+    return self.reviews.count()
 
