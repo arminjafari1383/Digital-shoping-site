@@ -208,6 +208,19 @@ class ProductVariant(models.Model):
             f"{self.color.name}"
         )
 
+    def reduce_stock(self,quantity):
+
+        if self.stock < quantity:
+
+            raise ValueError("Not enough stock.")
+
+        self.stock -= quantity
+
+        self.save(update_fields=["stock"])
+
+        
+        
+
 class ProductImage(models.Model):
 
     product = models.ForeignKey(

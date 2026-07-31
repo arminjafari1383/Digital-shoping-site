@@ -10,7 +10,7 @@ class Payment(models.Model):
 
         SUCCESS = "success","Success"
 
-        FAILED = "failed" , "Faield"
+        FAILED = "failed" , "Failed"
 
     
     id = models.UUIDField(
@@ -54,7 +54,16 @@ class Payment(models.Model):
         auto_now=True
     )
 
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
-        return str(self.id)
+        return f"{self.order.id} - {self.status}"
     
-    
+
+    class Meta:
+
+        ordering = ["-created_at"]
+        

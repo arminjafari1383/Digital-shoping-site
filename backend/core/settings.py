@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'coupons',
     'reviews',
     'wishlist',
-    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -146,7 +145,7 @@ REST_FRAMEWORK = {
         'rest_freamework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter'
     ),
-    
+
     
 }
 

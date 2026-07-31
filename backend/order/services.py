@@ -22,7 +22,7 @@ def chechout(user):
     )
     # if the shopping cart was empty
     if not cart.items.exists():
-        raise VadlidationError({
+        raise ValidationError({
             "cart":"Your cart is empty."
         })
     
@@ -37,10 +37,12 @@ def chechout(user):
     # loop on cart items
     for item in cart.items.all():
         # check cash
-        if item.product.stock <= 0:
-                raise VadlidationError({
-                    "stock":f"{item.product.title} is out of stock."
-                })
+        variant = item.variant
+
+        if variant.stock < item.quantity:
+            raise ValidationError({
+                "stock":f"{variant.product.title} does not have enough stock"
+            })
             
     
         # create orderitem
@@ -49,17 +51,19 @@ def chechout(user):
 
             product = item.product,
 
+            variant = variant,
+
             quantity = item.quantity,
 
-            price = item.product.discount_price or item.product.price
+            price = variant.price
         )
 
         # reduce cash
-        item.product.stock = F("stock") - item.quantity
+        variant.product.stock = F("stock") - item.quantity
 
-        item.product.save(update_fields=["stock"])
+        variant.product.save(update_fields=["stock"])
 
-        item.product.refresh_from_db()
+        variant.product.refresh_from_db()
 
         # sum costs
 
