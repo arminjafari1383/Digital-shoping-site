@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from .services import chechout
 from .serializers import OrderSerializer
 from .models import Order, OrderItem
-from products.models import Product
+from products.models import Product,ProductVariant
 from accounts.models import User
 from django.utils import timezone
 
@@ -102,6 +102,44 @@ class DashboardView(APIView):
             .aaggregate(total=Sum("total_price"))["total"] or 0
         )
 
+        low_stock_products = (
+            ProductVariant.objects
+            .filter(stock__lt=5, stock__gt=0)
+            .select_related("product","color","size")
+
+        )
+
+        out_of_stock_products = (
+            ProductVariant.objects
+            .filter(stock=0)
+            select_related("product","color","size")
+        )
+
+        low_stock_data = [
+            {
+                "variant_id":str(item.id)
+                "product":item.product.title,
+                "color":item.color.name,
+                "size":item.size.value,
+                "stock":item.stock,
+            }
+
+            for item in low_stock_products
+        ]
+
+
+        out_of_stock_data = [
+            {
+                "variant_id":str(item.id)
+                "product":item.product.title,
+                "color":item.color.name,
+                "size":item.size.value,
+                "stock":item.stock,
+            }
+
+            for item in out_of_stock_products
+        ]
+
         return Response({
 
             "total_orders": total_orders,
@@ -125,6 +163,10 @@ class DashboardView(APIView):
             "month_orders": month_orders_count,
 
             "month_income": month_income,
+
+            "low_stock_products": low_stock_data,
+
+            "out_of_stock_products": out_of_stock_data,
         })
 
     
