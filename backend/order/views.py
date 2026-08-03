@@ -1,4 +1,6 @@
 from django.db.models import Sum,Count
+from django.utils import timezone
+from django.db.models.functions import TruncDate,TruncMonth
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
@@ -7,7 +9,7 @@ from .serializers import OrderSerializer
 from .models import Order, OrderItem
 from products.models import Product,ProductVariant
 from accounts.models import User
-from django.utils import timezone
+
 
 
 
@@ -42,7 +44,7 @@ class DashboardView(APIView):
         total_income = (
             Order.objects.filter(
                 status="paid"
-            ).aaggregate(
+            ).aggregate(
                 total = Sum("total_price")
             )["total"] or 0
         )
@@ -99,7 +101,7 @@ class DashboardView(APIView):
 
         month_income = (
             month_orders.filter(status="paid")
-            .aaggregate(total=Sum("total_price"))["total"] or 0
+            .aggregate(total=Sum("total_price"))["total"] or 0
         )
 
         low_stock_products = (
@@ -112,12 +114,12 @@ class DashboardView(APIView):
         out_of_stock_products = (
             ProductVariant.objects
             .filter(stock=0)
-            select_related("product","color","size")
+            .select_related("product","color","size")
         )
 
         low_stock_data = [
             {
-                "variant_id":str(item.id)
+                "variant_id":str(item.id),
                 "product":item.product.title,
                 "color":item.color.name,
                 "size":item.size.value,
@@ -130,7 +132,7 @@ class DashboardView(APIView):
 
         out_of_stock_data = [
             {
-                "variant_id":str(item.id)
+                "variant_id":str(item.id),
                 "product":item.product.title,
                 "color":item.color.name,
                 "size":item.size.value,
@@ -138,6 +140,49 @@ class DashboardView(APIView):
             }
 
             for item in out_of_stock_products
+        ]
+
+        daily_sales = (
+            Order.objects
+            .filter(status="paid")
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(
+                income=Sum("total_price"),
+                orders=Count("id")
+            )
+            .order_by("day")
+        )
+
+        monthly_sales = (
+            Order.objects
+            .filter(status="paid")
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(
+                income=Sum("total_price"),
+                orders=Count("id")
+            )
+            .order_by("month")
+        )
+
+        daily_chart = [
+            {
+                "date": item["day"],
+                "income":item["income"],
+                "orders":item["orders"],
+            }
+
+            for item in daily_sales
+        ]
+
+        monthly_chart = [
+            {
+                "month":item["month"],
+                "income":item["income"],
+                "orders":item["orders"],
+            }
+            for item in monthly_sales
         ]
 
         return Response({
@@ -154,7 +199,7 @@ class DashboardView(APIView):
 
             "latest_orders": latest_orders,
 
-            "best_selling_products": best_selling,
+            "best_selling_products": list(best_selling),
 
             "today_orders": today_orders_count,
 
@@ -167,6 +212,11 @@ class DashboardView(APIView):
             "low_stock_products": low_stock_data,
 
             "out_of_stock_products": out_of_stock_data,
+
+            "daily_sales":daily_chart,
+
+            "monthly_sales":monthly_chart,
+            
         })
 
     
