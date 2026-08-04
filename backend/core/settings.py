@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'coupons',
     'reviews',
     'wishlist',
+    'notifications',
 ]
 
 MIDDLEWARE = [
