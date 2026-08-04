@@ -3,6 +3,8 @@ from .models import Order, OrderItem
 from cart.models import Cart
 from rest_framework.exceptions import ValidationError
 from django.db.models import F
+from notifications.services import create_notification
+from notifications.models import Notification
 
 
 
@@ -79,6 +81,12 @@ def chechout(user):
 
     cart.items.all().delete()
 
+    create_notification(
+        user = order.user,
+        title="Order Created",
+        message=f"Your order #{order.id} has been created successfully.",
+        notification_type=Notification.Type.ORDER,
+    )
     # return order
 
     return {

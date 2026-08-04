@@ -10,6 +10,8 @@ from .models import Order, OrderItem
 from products.models import Product,ProductVariant
 from accounts.models import User
 from datetime import timedelta
+from notifications.services import create_notification
+from notifications.models import Notification
 
 
 class CheckoutView(APIView):
@@ -274,5 +276,36 @@ class DashboardView(APIView):
         })
 
     
+class UpdateOrderStatusView(APIView):
 
-    
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, order_id):
+
+        order = Order.objects.get(id=order_id)
+
+        status = request.data.get("status")
+
+        order.status = status
+
+        order.save()
+
+        if order.status == Order.Status.SHIPPED:
+            create_notification(
+                user = order.user,
+                title="Order Shipped",
+                message="Your order has been shipped",
+                notification_type=Notification.Type.SHIPPING,
+            )
+
+        elif order.status == Order.Status.DELIVERED:
+            create_notification(
+                user=order.user,
+                title="Order Delivered",
+                message="Your order has been deliverd.",
+                notification_type=Notification.Type.SHIPPING,
+            )
+
+        return Response({
+            "message":"Order status updated."
+        })

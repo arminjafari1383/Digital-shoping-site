@@ -4,8 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import Payment
 from .services import request_payment
-
 from django.conf import settings
+from notifications.services import create_notification
+from notifications.models import Notification
+
+from order.models import Order
+
 
 
 class StartPaymentView(APIView):
@@ -54,7 +58,7 @@ class VerifyPaymentView(APIView):
             "Status"
         )
 
-        if status != "ok":
+        if status != "OK":
             return Response({
 
                 "message":
@@ -66,15 +70,26 @@ class VerifyPaymentView(APIView):
             authority=authority
         )
 
+        if payment.status == Payment.Status.SUCCESS:
+            return Response({
+                "message":"Payment already verified"
+            })
         payment.status = (
             Payment.Status.SUCCESS
         )
 
         payment.save()
 
+        create_notification(
+            user = payment.order.user,
+            title="Payment Successful",
+            message="Your payment was completed successfully.",
+            notification_type=Notification.Type.PAYMENT,
+        )
+
         order = payment.order
         
-        order.status = "paid"
+        order.status = Order.Status.PAID
 
         order.save()
 
