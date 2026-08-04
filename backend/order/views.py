@@ -9,8 +9,7 @@ from .serializers import OrderSerializer
 from .models import Order, OrderItem
 from products.models import Product,ProductVariant
 from accounts.models import User
-
-
+from datetime import timedelta
 
 
 class CheckoutView(APIView):
@@ -185,6 +184,49 @@ class DashboardView(APIView):
             for item in monthly_sales
         ]
 
+
+        total_users = User.objects.filter(
+            date_joined__date = today
+        ).count()
+
+        month_users = User.objects.filter(
+            date__joined__year = now.year,
+            date_joined__month=now.month
+        ).count()
+
+
+        published_products = Product.objects.filter(
+            status = Product.Status.PUBLISHED
+        ).count()
+
+        draft_products = Product.objects.filter(
+            status = Product.Status.DRAFT
+        ).count()
+
+        first_day_this_month = now.replace(day=1)
+
+        last_month = first_day_this_month - timedelta(days=1)
+
+        last_month_income = (
+            Order.objects.filter(
+                status = "paid",
+                created_at__year = last_month.year,
+                created_at__month = last_month.month
+            ).aggregate(
+                total=Sum("total_price")
+            )["total"] or 0
+        )
+
+        if last_month_income > 0:
+            growth = (
+                (month_income - last_month_income)
+                /last_month_income
+            ) * 100
+
+        else:
+            growth = 100 if month_income > 0 else 0
+
+
         return Response({
 
             "total_orders": total_orders,
@@ -216,6 +258,18 @@ class DashboardView(APIView):
             "daily_sales":daily_chart,
 
             "monthly_sales":monthly_chart,
+
+            "today_users": today_users,
+
+            "month_users": month_users,
+
+            "published_products":published_products,
+
+            "draft_products":draft_products,
+
+            "last_month_income":last_month_income,
+
+            "sales_growth_percent":round(growth,2),
             
         })
 
