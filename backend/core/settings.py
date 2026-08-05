@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'notifications',
     'addresses',
     'reports',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -149,6 +150,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter'
     ),
 
+    'DEFAULT_SCHEMA_CLASS':'drf_spectacular.openapi.AutoSchema',
     
 }
 
@@ -197,3 +199,10 @@ CELERY_BROKER_URL = (
 CELERY_RESULT_BACKEND = (
     "redis://127.0.0.1:6379/0"
 )
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE':'Digital Shopping API',
+    'DESCRIPTION':'API documentation for Digital Shopping Backend',
+    'VERSION':'1.0.0'
+}
