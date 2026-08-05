@@ -5,6 +5,11 @@ from rest_framework.exceptions import ValidationError
 from .models import Review
 from .serializers import ReviewSerializer
 from products.models import Product
+from django.shortcuts import get_object_or_404
+from products.models import Product
+
+
+
 
 class ReviewListCreateView(generics.ListCreateAPIView):
 
@@ -23,8 +28,13 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self,serializer):
 
-        product = Product.objects.get(
+        product = get_object_or_404(
+            Product,
             id=self.kwargs["product_id"]
+        )
+        serializer.save(
+            user=self.request.user,
+            product=product
         )
 
         if Review.objects.filter(

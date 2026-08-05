@@ -7,7 +7,7 @@ from .services import request_payment
 from django.conf import settings
 from notifications.services import create_notification
 from notifications.models import Notification
-
+from notifications.tasks import send_notification_task
 from order.models import Order
 
 
@@ -80,11 +80,11 @@ class VerifyPaymentView(APIView):
 
         payment.save()
 
-        create_notification(
-            user = payment.order.user,
-            title="Payment Successful",
-            message="Your payment was completed successfully.",
-            notification_type=Notification.Type.PAYMENT,
+        send_notification_task.delay(
+            payment.order.user.id,
+            "Payment Successful",
+            "Your payment was completed successfully.",
+            Notification.Type.PAYMENT,
         )
 
         order = payment.order
