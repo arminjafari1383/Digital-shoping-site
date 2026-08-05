@@ -56,4 +56,19 @@ class UnreadNotificationCountView(APIView):
             "unread_notifications":count
         })
 
+
+class ClearReadNotificationsView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        Notification.objects.filter(
+            user=request.user,
+            is_read=True
+        ).delete()
+
+        return Response({
+            "message":"Read notifications deleted."
+        })
+
     
