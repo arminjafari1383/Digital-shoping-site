@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -52,10 +53,12 @@ INSTALLED_APPS = [
     'addresses',
     'reports',
     'drf_spectacular',
+    'coresheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'coresheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -206,3 +209,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION':'API documentation for Digital Shopping Backend',
     'VERSION':'1.0.0'
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
